@@ -15,9 +15,9 @@ package
 		{
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
+	
 			
-			
-			mStarling = new Starling(Game, stage, new Rectangle(0,0,1280,800));
+			mStarling = new Starling(Game, stage, new Rectangle(0,0,stage.fullScreenWidth,stage.fullScreenHeight));
 			mStarling.start();
 		}
 	}

@@ -10,6 +10,8 @@ package
 	{
 		public static const TYPE_SWARM:String ="swarm";
 		private static const NORMAL:Point = new Point(0,1);
+		
+		
 		private var m_velocity:Point;
 		private var m_mass:Number;
 		private var m_force:Point;
@@ -24,16 +26,22 @@ package
 		
 		public var targetPoint:Point;
 		
-		public function Entity()
+		private var m_steeringBehaviors:Vector.<ISteeringBehavior>;
+		private var m_averagedSteeringBehaviors:Vector.<ISteeringBehavior>;
+		
+		public function Entity(_mass:Number,_maxTurnSpeed:Number,_maxSpeed:Number,_steeringBehaviors:Vector.<ISteeringBehavior>,_averagedSteeringBehaviors:Vector.<ISteeringBehavior>)
 		{
 			m_position = new Point(0,0);
-			m_mass = 50;
+			m_mass = _mass;
 			m_force = new Point(0,0);
 			m_velocity = new Point(0,0);
 			m_heading = new Point(0,1);
 			m_lastTime = -1;
-			m_maxSpeed = 1;
-			m_maxTurnSpeed = 2;
+			m_maxSpeed = _maxSpeed;
+			m_maxTurnSpeed = _maxTurnSpeed;
+			
+			m_steeringBehaviors = _steeringBehaviors;
+			m_averagedSteeringBehaviors = _averagedSteeringBehaviors;
 		}
 		
 		public function update(entitys:Vector.<Entity>):void
@@ -52,9 +60,9 @@ package
 			var disp:Point = calculateDisplacement(m_elapsedTimeSec,m_velocity,acc);
 			m_velocity = calculateVelocity(m_elapsedTimeSec,m_velocity,acc);
 			
-			if(m_velocity.length > 80)
+			if(m_velocity.length > m_maxSpeed)
 			{
-				m_velocity.normalize(80);
+				m_velocity.normalize(m_maxSpeed);
 			}
 			m_position.x += disp.x;
 			m_position.y += disp.y;
@@ -63,55 +71,9 @@ package
 		
 		public function updateHeading(entitys:Vector.<Entity>):Point
 		{		
-			var force:Point = new Point();
-			var force2:Point = new Point();
-			var dist:Number;
-			var t:Number ;
-			
-			var forceTotal:Point = new Point();
-			
-			var avHeading:Point = new Point(0,0);
-			for each(var entity:Entity in entitys)
-			{
-				if(entity == this)
-					continue;
-	
-				force.x = entity.x - this.x;
-				force.y = entity.y - this.y;
-				
-				force2.x = entity.x - this.x;
-				force2.y = entity.y - this.y;
-				
-				dist = Math.sqrt(Math.pow(force.x,2) + Math.pow(force.y,2)); 
-				 
-				t = ((this.mass * entity.mass *400)/Math.pow(dist,2));
-				force.normalize(t);
-				force2.normalize(50);
 
-				forceTotal.x -= force.x;
-				forceTotal.y -= force.y;
-				
-				
-				forceTotal.x += force2.x;
-				forceTotal.y += force2.y;
-				
-				
-				var hd:Point =  entity.heading.clone();
-				hd.normalize(1);
-				avHeading.x += hd.x;
-				avHeading.y += hd.y;
-
-			}
-			
-			avHeading.x = avHeading.x / entitys.length -1;
-			avHeading.y = avHeading.y / entitys.length -1;
-			
-			avHeading.normalize(forceTotal.length);
-			
-			avHeading.x = avHeading.x  / 1;
-			avHeading.y = avHeading.y / 1;
-			
-			
+			var forceTotal:Point = new Point(0,0);
+			var force:Point;
 			if(targetPoint != null)
 			{
 				var steerF:Point = new Point(targetPoint.x - x,targetPoint.y - y);
@@ -122,16 +84,32 @@ package
 				forceTotal.y += steerF.y;
 			}
 			
-			forceTotal.x = (avHeading.x + forceTotal.x) /2;
-			forceTotal.y = (avHeading.y + forceTotal.y) / 2;
+			for each (var sb:ISteeringBehavior in m_steeringBehaviors)
+			{
+				 force = sb.calculateForce(entitys,this);
+				 
+				 forceTotal.x += force.x;
+				 forceTotal.y += force.y
+			}
+			
+			var asbForce:Point = new Point(0,0);
+			for each (var asb:ISteeringBehavior in m_averagedSteeringBehaviors)
+			{
+				force = asb.calculateForce(entitys,this);
+				
+				
+				asbForce.x += force.x;
+				asbForce.y += force.y
+			}
+			asbForce.normalize(forceTotal.length);
+			
+			forceTotal.x =  (forceTotal.x + asbForce.x) / 2;
+			forceTotal.y =  (forceTotal.y + asbForce.y) / 2;
 			
 			
 			forceTotal.normalize(5000);
 			
 
-			
-			//forceTotal.x = avHeading.x;
-			//forceTotal.y = avHeading.y;
 			
 			var currentAngle:Number = getAngle(NORMAL,m_heading);
 			var target:Number = getAngle(NORMAL,forceTotal);

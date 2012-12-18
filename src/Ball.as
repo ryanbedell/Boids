@@ -12,13 +12,20 @@ package
 
 	public class Ball extends starling.display.Sprite
 	{
+		public static var CONST_XML:XML = <Boid name="Ball" mass="50" maxSpeed="80" maxTurnSpeed="2">
+											<AttractionBehavior attractionForce="50"/>
+											<RepulsionBehavior  massMultiplier="400"/>
+											<AverageHeadingBehavior/>
+										  </Boid>;
+		
+		
 		private var entitiy:Entity; 
 		private var image:Image;
 		public function Ball()
 		{
-			entitiy = new Entity();
+			var ob:Object = parse(CONST_XML); 
 			
-		
+			entitiy = new Entity(ob['mass'],ob['maxTurnSpeed'],ob['maxSpeed'],ob['steering'],ob['avSteering']);
 			
 			var sh:Shape = new Shape();
 			sh.graphics.beginFill(0xDEADBE,1);
@@ -79,6 +86,47 @@ package
 		public function get entity():Entity
 		{
 			return entitiy;
+		}
+		
+		public function parse(xml:XML):Object
+		{
+			var ret:Object = new Object();
+			ret['mass'] = xml.@mass;
+			ret['maxSpeed'] = xml.@maxSpeed;
+			ret['maxTurnSpeed'] = xml.@maxTurnSpeed;
+			
+			var steering:Vector.<ISteeringBehavior> = new Vector.<ISteeringBehavior>();
+			var avSteering:Vector.<ISteeringBehavior> = new Vector.<ISteeringBehavior>();
+			
+			for each(var node:XML in xml.children())
+			{
+				var behavior:ISteeringBehavior;
+				trace(node.name())
+				var name:String = node.name()
+				switch(name)
+				{
+					case "AttractionBehavior":
+						behavior = new AttractionBehavior();
+						behavior.init(node);
+						steering.push(behavior);
+						break;
+					case "RepulsionBehavior":
+						behavior = new RepulsionBehavior();
+						behavior.init(node);
+						steering.push(behavior);
+						break;
+					case "AverageHeadingBehavior":
+						behavior = new AverageHeadingBehavior();
+						behavior.init(node);
+						avSteering.push(behavior);
+						break;
+				}
+			}
+			
+			ret['steering'] = steering;
+			ret['avSteering'] = avSteering;
+			
+			return ret;
 		}
 	}
 }
