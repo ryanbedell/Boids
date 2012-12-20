@@ -13,6 +13,7 @@ package
 		private var mStarling:Starling;
 		public function Boids()
 		{
+			Starling.multitouchEnabled = true;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 	

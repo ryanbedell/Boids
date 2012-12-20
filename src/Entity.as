@@ -24,12 +24,14 @@ package
 		private var m_maxSpeed:Number;
 		private var m_maxTurnSpeed:Number;
 		
-		public var targetPoint:Point;
+		public var targetPoints:Vector.<Point>;
 		
-		private var m_steeringBehaviors:Vector.<ISteeringBehavior>;
-		private var m_averagedSteeringBehaviors:Vector.<ISteeringBehavior>;
+		public var m_steeringBehaviors:Vector.<ISteeringBehavior>;
+		public var m_averagedSteeringBehaviors:Vector.<ISteeringBehavior>;
 		
-		public function Entity(_mass:Number,_maxTurnSpeed:Number,_maxSpeed:Number,_steeringBehaviors:Vector.<ISteeringBehavior>,_averagedSteeringBehaviors:Vector.<ISteeringBehavior>)
+		private var rot:Number = 0;
+		
+		public function Entity(_mass:Number,_maxTurnSpeed:Number,_maxSpeed:Number/*,_steeringBehaviors:Vector.<ISteeringBehavior>,_averagedSteeringBehaviors:Vector.<ISteeringBehavior>*/)
 		{
 			m_position = new Point(0,0);
 			m_mass = _mass;
@@ -40,8 +42,6 @@ package
 			m_maxSpeed = _maxSpeed;
 			m_maxTurnSpeed = _maxTurnSpeed;
 			
-			m_steeringBehaviors = _steeringBehaviors;
-			m_averagedSteeringBehaviors = _averagedSteeringBehaviors;
 		}
 		
 		public function update(entitys:Vector.<Entity>):void
@@ -74,15 +74,6 @@ package
 
 			var forceTotal:Point = new Point(0,0);
 			var force:Point;
-			if(targetPoint != null)
-			{
-				var steerF:Point = new Point(targetPoint.x - x,targetPoint.y - y);
-				//if(steerF.length > 500)
-				steerF.normalize(1000);
-				
-				forceTotal.x += steerF.x;
-				forceTotal.y += steerF.y;
-			}
 			
 			for each (var sb:ISteeringBehavior in m_steeringBehaviors)
 			{
@@ -127,6 +118,7 @@ package
 			heading = rotatePoint(heading,-1*(currentAngle + diff));
 			heading.normalize(forceTotal.length);
 		
+			rot += diff;
 			
 			//return forceTotal;
 			return heading;
@@ -227,6 +219,17 @@ package
 		public function get heading():Point
 		{
 			return m_heading;
+		}
+		
+		public function get rotation():Number
+		{
+			/*var h:Point = heading.clone();
+			h.normalize(1);
+
+		
+			return rot + Math.PI /2;*/
+			
+			return Math.atan2(heading.y,heading.x) + Math.PI/2;
 		}
 	}
 }

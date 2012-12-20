@@ -12,3 +12,5 @@ bin-debug/assets/mini.png
 bin-debug/assets/touch_marker.png
 
 .DS_Store
+
+bin-debug/testLevel.png
