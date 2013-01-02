@@ -31,7 +31,9 @@ package
 		
 		private var rot:Number = 0;
 		
-		public function Entity(_mass:Number,_maxTurnSpeed:Number,_maxSpeed:Number/*,_steeringBehaviors:Vector.<ISteeringBehavior>,_averagedSteeringBehaviors:Vector.<ISteeringBehavior>*/)
+		public var m_geometry:Vector.<Vector.<Point>>;
+		
+		public function Entity(_mass:Number,_maxTurnSpeed:Number,_maxSpeed:Number,_geometry:Vector.<Vector.<Point>> = null)
 		{
 			m_position = new Point(0,0);
 			m_mass = _mass;
@@ -41,7 +43,7 @@ package
 			m_lastTime = -1;
 			m_maxSpeed = _maxSpeed;
 			m_maxTurnSpeed = _maxTurnSpeed;
-			
+			m_geometry = _geometry;
 		}
 		
 		public function update(entitys:Vector.<Entity>):void
@@ -181,13 +183,11 @@ package
 		
 		public function set x(value:Number):void
 		{
-			trace("x",value)
 			m_position.x = value;
 		}
 		
 		public function set y(value:Number):void
 		{
-			trace("y",value)
 			m_position.y = value;
 		}
 		
@@ -230,6 +230,11 @@ package
 			return rot + Math.PI /2;*/
 			
 			return Math.atan2(heading.y,heading.x) + Math.PI/2;
+		}
+		
+		public function get location():Point
+		{
+			return new Point(x,y);
 		}
 	}
 }

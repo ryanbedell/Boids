@@ -5,12 +5,17 @@ package
 	import flash.display.Shape;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
+	import flash.media.Sound;
 	
 	import starling.display.Image;
 	import starling.display.Sprite;
 	
-	public class Bubble extends Sprite
+	public class Bubble extends Sprite implements IUpdate
 	{
+		
+		[Embed(source="pop.mp3")]
+		public var soundClass:Class;
+		
 		private var image:Image;
 		private var radius:Number = 100;
 		
@@ -53,7 +58,7 @@ package
 		public function initBoids():void
 		{
 			m_boids = new Vector.<Ball>;
-			for(var i:int = 0; i < 40; i++)
+			for(var i:int = 0; i < 20; i++)
 			{
 				var boid:Ball = new Ball();
 				boid.x = (((Math.random() * 2)) * radius/3) - radius/2;
@@ -81,6 +86,9 @@ package
 		
 		public function pop():void
 		{
+			var smallSound:Sound = new soundClass() as Sound;
+			smallSound.play();
+			
 			if(m_boids != null)
 			{
 				for each(var boid:Ball in m_boids)
@@ -95,7 +103,7 @@ package
 				m_boids = null;
 			}
 			
-		
+			m_game.others.splice(m_game.others.indexOf(this),1);
 		}
 	}
 }

@@ -44,9 +44,11 @@ package
 				avHeading.y += hd.y;
 			}*/
 			
-			
-			avHeading.x = avHeading.x / (entities.length -1);
-			avHeading.y = avHeading.y / (entities.length -1);
+			if(entities.length != 1)
+			{
+				avHeading.x = avHeading.x / (entities.length -1);
+				avHeading.y = avHeading.y / (entities.length -1);
+			}
 			
 			return avHeading;
 		}

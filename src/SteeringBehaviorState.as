@@ -49,7 +49,7 @@ package
 			for each(var node:XML in xml.children())
 			{
 				var behavior:ISteeringBehavior;
-				trace(node.name())
+				//trace(node.name())
 				var name:String = node.name()
 				switch(name)
 				{
@@ -70,6 +70,11 @@ package
 						break;
 					case "AverageHeadingBehavior":
 						behavior = new AverageHeadingBehavior();
+						behavior.init(node);
+						avSteering.push(behavior);
+						break;
+					case "ObstacleAvoidanceBehavior":
+						behavior = new ObstacleAvoidanceBehavior();
 						behavior.init(node);
 						avSteering.push(behavior);
 						break;

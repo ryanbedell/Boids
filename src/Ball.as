@@ -11,7 +11,7 @@ package
 	import starling.display.Sprite;
 	import starling.textures.Texture;
 
-	public class Ball extends starling.display.Sprite
+	public class Ball extends starling.display.Sprite implements IUpdate
 	{
 		public static var CONST_XML:XML = <Boid name="Ball" mass="50" maxSpeed="80" maxTurnSpeed="2">
 											<AttractionBehavior attractionForce="50"/>
@@ -19,6 +19,8 @@ package
 											<AverageHeadingBehavior/>
 										  </Boid>;
 		
+		
+		private static var _texture:Texture;
 		
 		private var entitiy:Entity; 
 		private var image:Image;
@@ -34,7 +36,7 @@ package
 			var ob:Object = parse(CONST_XML); 
 			
 			
-			entitiy = new Entity(ob['mass'],ob['maxTurnSpeed'],ob['maxSpeed']);
+			entitiy = new Entity(ob['mass'],ob['maxTurnSpeed'],ob['maxSpeed'],Game.points);
 			
 			m_stateMachine = new StateMachine(this);
 			
@@ -126,6 +128,16 @@ package
 		public function get entity():Entity
 		{
 			return entitiy;
+		}
+		
+		public function createTexture():void
+		{
+			/*var sh:MovieClip = new boid_a();
+			var bitmapData:BitmapData = new BitmapData(40 * sh.totalFrames,60,true,0x00000000);
+			var xml:XML = new XML('<TextureAtlas imagePath="yar.png"><TextureAtlas imagePath="yar.png">')
+			for(var i:int = 1; i < sh.totalFrames; i ++)
+			{
+				bitmapData.draw(sh);*/
 		}
 		
 		public function parse(xml:XML):Object
